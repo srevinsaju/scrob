@@ -1,0 +1,16 @@
+[workspace]
+members = [
+  "config",
+  "scrob-cli",
+  "scrob-core",
+  "types"
+]
+resolver = "2"
+
+[profile.release]
+opt-level = 3
+# debug = 1
+
+[profile.dev]
+# https://jakedeichert.com/blog/reducing-rust-incremental-compilation-times-on-macos-by-70-percent/
+split-debuginfo = "unpacked"

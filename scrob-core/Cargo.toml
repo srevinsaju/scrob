@@ -1,0 +1,28 @@
+[package]
+name = "scrob-core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.130", features = ["derive"] }
+serde_json = "1.0.72"
+log = "0.4.14"
+discord-rich-presence = "0.1.8"
+futures = "0.3"
+notify-rust = { version = "4", features = ["images"] }
+rustfm-scrobble = "1.1.1"
+confy = "0.4.0"
+ctrlc = { version = "3.0", features = ["termination"] }
+
+config = { path = "../config" }
+types = { path = "../types" }
+
+
+[target.'cfg(unix)'.dependencies]
+mpris = "2.0.0-rc2"
+
+
+[target.'cfg(windows)'.dependencies]
+windows = { version =  "0.28.0", features = ["Media", "Media_Control", "Foundation"] }

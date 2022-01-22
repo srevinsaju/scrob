@@ -1,0 +1,84 @@
+use types::song::Song;
+
+
+use windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager as MediaManager;
+use windows::Media::Control::GlobalSystemMediaTransportControlsSessionPlaybackStatus as MediaStatus;
+use log::warn;
+use std::time::Duration;
+use log::trace;
+
+
+pub fn get_current_song() -> Result<Song, &'static str> {
+    let manager = MediaManager::RequestAsync().expect("Failed to connect to Windows Media Manager");
+    let session = manager.get().expect("Failed to get sessions from Windows Media Manager");
+    let current_session = session.GetCurrentSession();
+    if let Err(e) = current_session {
+        warn!("No active sessions detected, skipping: {}", e);
+        return Ok(Song::new());
+    }
+
+    let current_session = current_session.unwrap();
+
+    let info = current_session.TryGetMediaPropertiesAsync();
+    if let Err(e) = info {
+        warn!("No song metadata was received: {}", e);
+        return Ok(Song::new())
+    }
+    let info = info.unwrap();
+
+    let mut is_playing = true;
+
+    let current_session_playback_info = current_session.GetPlaybackInfo();
+    if let Ok(playback_info) = current_session_playback_info {
+        is_playing = playback_info.PlaybackStatus().unwrap_or(MediaStatus::Playing) == MediaStatus::Playing;
+    } 
+
+    let mut duration = Duration::new(0, 0);
+    let mut position = Duration::new(0, 0);
+
+    let current_session_timeline_info = current_session.GetTimelineProperties();
+    if let Ok(timeline_info) = current_session_timeline_info {
+        let end_time = timeline_info.EndTime().expect("Failed to get end time of media");
+        duration = end_time.into();
+
+        let current_time = timeline_info.Position().expect("Failed to get position");
+        position = current_time.into();
+    }
+
+    let mut source = "lyrix";
+    if let Ok(origin) = current_session.SourceAppUserModelId() {
+        let origin = origin.to_string();
+        trace!("Detected song from '{}'", origin);
+        if origin.starts_with("Microsoft.ZuneMusic") {
+            source = "groove-music"
+        } else if origin == "Chrome" {
+            source = "chrome"
+        } else if origin.contains("Spotify") {
+            source = "spotify"
+        } else if origin == "app.ytmd" {
+            source = "youtube-music"
+        }    
+    }
+    
+    let song_metadata = info.get().expect("Failed to unwrap song metadata even if retrieval was successful.");
+    
+    let song = Song {
+        track: song_metadata.Title().expect("Failed to retrieve title from song").to_string(),
+        artist: song_metadata.Artist().expect("Failed to retrieve artist from song").to_string(),
+        album_art: "".to_string(),
+        artist_mbid: "".to_string(),
+        duration: duration,
+        is_repeat: false,
+        is_playing: is_playing,
+        mbid: "".to_string(),
+        position: position,
+        scrobble: false, // will be set later
+        source: source.into(),
+        url: "".to_string(),
+    };
+
+    trace!("{:?}", song);
+    trace!("Is playing?: {}", is_playing);
+    
+    return Ok(song);
+}
