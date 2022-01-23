@@ -33,10 +33,12 @@ jobs:
     - name: Build
       run: cargo build
     - name: Build (optimzed)
+      env: 
+        RUSTFLAGS: "-C link-arg=-s"
       run: |
-        RUSTFLAGS='-C link-arg=-s' cargo build --release 
+        cargo build --release 
         mkdir _release
-        mv target/release/scrob-*
+        mv target/release/scrob-* _release/.
 
     - uses: actions/upload-artifact@v2
       with:
