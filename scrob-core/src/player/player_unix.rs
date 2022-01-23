@@ -1,17 +1,15 @@
 use std::time::SystemTime;
 
-use types::song::Song;
 use log::trace;
-use mpris::{PlayerFinder, PlaybackStatus};
+use mpris::{PlaybackStatus, PlayerFinder};
+use types::song::Song;
 
-
-/// use linux's mpris dbus data to get the current playing 
-/// song from the active player. If the song is originating from 
-/// a dbus id containing "chromium", preference is given to 
-/// Plasma Browser Integration since it gives accurate values 
+/// use linux's mpris dbus data to get the current playing
+/// song from the active player. If the song is originating from
+/// a dbus id containing "chromium", preference is given to
+/// Plasma Browser Integration since it gives accurate values
 /// on the artist, album name, and track name .
 pub fn get_current_song() -> Result<Song, &'static str> {
-
     let player_instance = PlayerFinder::new();
     if player_instance.is_err() {
         return Err("Could not connect to DBUS");
@@ -21,9 +19,9 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     let players = player_instance.find_all();
     if players.is_err() {
         return Err("Could not find any players");
-    } 
+    }
     let players = players.unwrap();
-    
+
     let mut current_player = player_instance
         .find_active()
         .expect("Could not find active player");
@@ -34,16 +32,22 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         // give preference to plasma browser integration
         // since that gives the right artist + title description
         // do this only if the current player has chromium in the bundle id
-        if current_player.bus_name().contains("chromium") && player
-            .bus_name()
-            .starts_with("org.mpris.MediaPlayer2.plasma-browser-integration")
+        if current_player.bus_name().contains("chromium")
+            && player
+                .bus_name()
+                .starts_with("org.mpris.MediaPlayer2.plasma-browser-integration")
             && player.is_running()
         {
             current_player = player;
             break;
         }
-        if player.is_running() && player.get_playback_status().unwrap_or(PlaybackStatus::Paused) == PlaybackStatus::Playing {
-            // we found a running player 
+        if player.is_running()
+            && player
+                .get_playback_status()
+                .unwrap_or(PlaybackStatus::Paused)
+                == PlaybackStatus::Playing
+        {
+            // we found a running player
             // and its playing, so this is probably the active player.
             current_player = player;
         }
@@ -71,7 +75,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         } else if let Some(a) = hmm.as_str() {
             artist = a;
         }; // (metadata.artists().unwrap_or(&[]).join(", "));
-    } 
+    }
     // println!("{:?}", artist);
 
     let mut source = "";
@@ -84,11 +88,20 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         source = "spotify";
     } else if url.contains("youtube.com") {
         source = "youtube";
-    } else if current_player.bus_name().starts_with("org.mpris.MediaPlayer2.vlc") {
+    } else if current_player
+        .bus_name()
+        .starts_with("org.mpris.MediaPlayer2.vlc")
+    {
         source = "vlc";
-    } else if current_player.bus_name().starts_with("org.mpris.MediaPlayer2.rhythmbox") {
+    } else if current_player
+        .bus_name()
+        .starts_with("org.mpris.MediaPlayer2.rhythmbox")
+    {
         source = "rhythmbox";
-    } else if current_player.bus_name().starts_with("org.mpris.MediaPlayer2.elisa") {
+    } else if current_player
+        .bus_name()
+        .starts_with("org.mpris.MediaPlayer2.elisa")
+    {
         source = "elisa";
     }
 

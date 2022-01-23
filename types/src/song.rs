@@ -2,10 +2,6 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::time::{Duration, SystemTime};
 
-
-
-
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Song {
     pub track: String,
@@ -31,7 +27,7 @@ impl Song {
     pub fn from_json(data: &str) -> Song {
         serde_json::from_str(data).unwrap()
     }
-    
+
     /// creates an empty song instance with defaults for all fields
     pub fn new() -> Song {
         Song {

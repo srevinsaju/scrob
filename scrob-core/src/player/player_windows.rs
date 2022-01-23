@@ -1,20 +1,20 @@
 use types::song::Song;
 
-
-use windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager as MediaManager;
-use windows::Media::Control::GlobalSystemMediaTransportControlsSessionPlaybackStatus as MediaStatus;
+use log::trace;
 use log::warn;
-use windows::Media::MediaTimelineController;
 use std::time::Duration;
 use std::time::SystemTime;
-use log::trace;
-
+use windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager as MediaManager;
+use windows::Media::Control::GlobalSystemMediaTransportControlsSessionPlaybackStatus as MediaStatus;
+use windows::Media::MediaTimelineController;
 
 /// Uses the winrt api to get access the media player data.
 pub fn get_current_song() -> Result<Song, &'static str> {
     // TODO: figure out how to get the position of the song
     let manager = MediaManager::RequestAsync().expect("Failed to connect to Windows Media Manager");
-    let session = manager.get().expect("Failed to get sessions from Windows Media Manager");
+    let session = manager
+        .get()
+        .expect("Failed to get sessions from Windows Media Manager");
     let current_session = session.GetCurrentSession();
     if let Err(e) = current_session {
         warn!("No active sessions detected, skipping: {}", e);
@@ -25,7 +25,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     let info = current_session.TryGetMediaPropertiesAsync();
     if let Err(e) = info {
         warn!("No song metadata was received: {}", e);
-        return Ok(Song::new())
+        return Ok(Song::new());
     }
     let info = info.unwrap();
 
@@ -33,17 +33,20 @@ pub fn get_current_song() -> Result<Song, &'static str> {
 
     let current_session_playback_info = current_session.GetPlaybackInfo();
     if let Ok(playback_info) = current_session_playback_info {
-        
-        
-        is_playing = playback_info.PlaybackStatus().unwrap_or(MediaStatus::Playing) == MediaStatus::Playing;
-    } 
+        is_playing = playback_info
+            .PlaybackStatus()
+            .unwrap_or(MediaStatus::Playing)
+            == MediaStatus::Playing;
+    }
 
     let mut duration = Duration::new(0, 0);
     let mut position = Duration::new(0, 0);
 
     let current_session_timeline_info = current_session.GetTimelineProperties();
     if let Ok(timeline_info) = current_session_timeline_info {
-        let end_time = timeline_info.EndTime().expect("Failed to get end time of media");
+        let end_time = timeline_info
+            .EndTime()
+            .expect("Failed to get end time of media");
         duration = end_time.into();
 
         let current_time = timeline_info.Position().expect("Failed to get position");
@@ -64,17 +67,28 @@ pub fn get_current_song() -> Result<Song, &'static str> {
             source = "youtube-music"
         }
     }
-    
-    let song_metadata = info.get().expect("Failed to unwrap song metadata even if retrieval was successful.");
+
+    let song_metadata = info
+        .get()
+        .expect("Failed to unwrap song metadata even if retrieval was successful.");
 
     let song = Song {
-        track: song_metadata.Title().expect("Failed to retrieve title from song").to_string(),
-        artist: song_metadata.Artist().expect("Failed to retrieve artist from song").to_string(),
+        track: song_metadata
+            .Title()
+            .expect("Failed to retrieve title from song")
+            .to_string(),
+        artist: song_metadata
+            .Artist()
+            .expect("Failed to retrieve artist from song")
+            .to_string(),
         album_art: "".to_string(),
         artist_mbid: "".to_string(),
         duration: duration,
         start_time: SystemTime::now(),
-        album: song_metadata.AlbumTitle().expect("Failed to retrieve album from song").to_string(),
+        album: song_metadata
+            .AlbumTitle()
+            .expect("Failed to retrieve album from song")
+            .to_string(),
         is_repeat: false,
         is_playing: is_playing,
         mbid: "".to_string(),
@@ -86,6 +100,6 @@ pub fn get_current_song() -> Result<Song, &'static str> {
 
     trace!("{:?}", song);
     trace!("Is playing?: {}", is_playing);
-    
+
     return Ok(song);
 }

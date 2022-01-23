@@ -15,6 +15,7 @@ notify-rust = { version = "4", features = ["images"] }
 rustfm-scrobble = "1.1.1"
 confy = "0.4.0"
 ctrlc = { version = "3.0", features = ["termination"] }
+musicbrainz_rs = "0.4.0"
 
 config = { path = "../config" }
 types = { path = "../types" }

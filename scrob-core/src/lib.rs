@@ -1,9 +1,8 @@
 pub mod core;
 use types::config::ScrobConfig;
-mod integrations; 
+mod integrations;
 pub mod player;
 use crate::integrations::base::BaseIntegrationTrait;
-
 
 pub struct Context {
     pub integrations: Vec<Box<dyn BaseIntegrationTrait>>,

@@ -5,15 +5,12 @@ use config as meta;
 use log::trace;
 use text_io::read;
 
-
 use env_logger;
-use scrob_core::Preferences;
 use scrob_core::core::core;
+use scrob_core::Preferences;
 use types::config::ScrobConfig;
 
-
 fn main() {
-
     env_logger::init();
 
     let matches = clap_app!(scrob =>
@@ -28,7 +25,7 @@ fn main() {
         (@subcommand gui =>
             (about: "Open scrob GUI")
         )
-        
+
     )
     .get_matches();
 
@@ -54,7 +51,6 @@ fn main() {
     }
 
     let prefs = Preferences {
-
         enable_discord_rich_presence: matches.is_present("discord"),
         enable_lastfm_scrobble: matches.is_present("lastfm_scrobble"),
     };
@@ -65,5 +61,4 @@ fn main() {
     } else {
         core(prefs);
     }
-    
 }

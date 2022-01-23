@@ -1,10 +1,10 @@
 use types::song::Song;
 
 use crate::integrations::base::BaseIntegrationTrait;
-use std::error::Error;
 use log::warn;
 use notify_rust::Notification as Ntfy;
 use notify_rust::Timeout;
+use std::error::Error;
 
 pub struct Notification {
     pub enabled: bool,
@@ -13,9 +13,7 @@ pub struct Notification {
 impl Notification {
     pub fn new() -> Result<Notification, &'static str> {
         // handle error here
-        Ok(Notification {
-            enabled: true,
-        })
+        Ok(Notification { enabled: true })
     }
 }
 
@@ -26,13 +24,13 @@ impl BaseIntegrationTrait for Notification {
         if song.is_repeat {
             is_repeat = "(on Repeat)";
         }
-    
+
         let notif = Ntfy::new()
             .summary(format!("{}", song.track).as_str())
             .body(format!("{} {}", song.artist, is_repeat).as_str())
             .timeout(Timeout::Milliseconds(6000))
             .show();
-        
+
         if let Err(n) = notif {
             warn!("Error when setting notification: {}", n);
         }

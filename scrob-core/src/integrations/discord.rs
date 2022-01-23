@@ -63,22 +63,18 @@ impl BaseIntegrationTrait for Discord {
 
         let current_time = std::time::SystemTime::now();
         let since_the_epoch = current_time
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards");
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
 
-        
-
-        
         #[cfg(windows)]
-        let timestamps = activity::Timestamps::new()
-            .start(since_the_epoch.as_secs() as i64);
-        
+        let timestamps = activity::Timestamps::new().start(since_the_epoch.as_secs() as i64);
 
         #[cfg(unix)]
-        let mut end_timestamp = (since_the_epoch.as_secs() + song.duration.as_secs() - song.position.as_secs()) as i64;
+        let mut end_timestamp =
+            (since_the_epoch.as_secs() + song.duration.as_secs() - song.position.as_secs()) as i64;
         #[cfg(unix)]
         if end_timestamp < since_the_epoch.as_secs() as i64 {
-            // if the song is over, set the end timestamp to 
+            // if the song is over, set the end timestamp to
             // the current time, so discord will show the song as over
             end_timestamp = since_the_epoch.as_secs() as i64;
         }
