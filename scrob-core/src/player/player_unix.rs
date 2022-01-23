@@ -1,7 +1,13 @@
 use types::song::Song;
-use log::{trace, debug};
+use log::trace;
 use mpris::{PlayerFinder, PlaybackStatus};
 
+
+/// use linux's mpris dbus data to get the current playing 
+/// song from the active player. If the song is originating from 
+/// a dbus id containing "chromium", preference is given to 
+/// Plasma Browser Integration since it gives accurate values 
+/// on the artist, album name, and track name .
 pub fn get_current_song() -> Result<Song, &'static str> {
 
     let player_instance = PlayerFinder::new();

@@ -4,6 +4,7 @@ use log::{debug, info, trace, warn};
 use types::config::ScrobConfig;
 use types::song::Song;
 use config as meta;
+use colored::*;
 
 use crate::Context;
 use crate::Preferences;
@@ -16,7 +17,14 @@ use crate::player;
 
 const INTERVAL: u64 = 2000;
 
+/// `main_loop` handles two kinds of events, song playback 
+/// and song pause. When the song is played, or a song is changed
+/// the .set event is triggered, and when the song is stopped 
+/// the .release event is triggered.
+/// This is repeated for every plugin which is enabled by the command 
+/// line arguments or the context provided as the first argument `Context`
 pub fn main_loop(ctx: Context) {
+
     let mut current_song = Song::new();
 
     let mut integrations = ctx.integrations;
@@ -71,7 +79,7 @@ pub fn main_loop(ctx: Context) {
                 current_song.track = res.track.clone();
                 current_song.artist = res.artist.clone();
                 current_song.album = res.album.clone();
-                println!("{}\n{}\n{}\n\n", current_song.track, current_song.artist, current_song.album);
+                println!("{}\n{}\n{}\n\n", current_song.track.green(), current_song.artist, current_song.album.bold());
 
             } else {
                 // the +3 is to accomodate for latencies on position report
@@ -83,8 +91,8 @@ pub fn main_loop(ctx: Context) {
                 if is_repeat {
                     trace!("The song is on repeat!!, {:?} {:?}", current_song, res);
                     println!(
-                        "{}\n{}\non Repeat.\n\n",
-                        current_song.track, current_song.artist
+                        "{}\n{}\n{}\non Repeat.\n\n",
+                        current_song.track.green(), current_song.artist, current_song.album.bold(),
                     );
                     res.is_repeat = true;
                     for i in integrations.iter_mut() {
@@ -111,6 +119,9 @@ pub fn main_loop(ctx: Context) {
     }
 }
 
+
+/// loads all the configuration and parses the preferences. 
+/// runs the `main_loop` at the end of the function. 
 pub fn core(prefs: Preferences) {
     
     info!("{} {}", meta::APP_NAME, meta::APP_VERSION);

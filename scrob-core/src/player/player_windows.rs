@@ -8,7 +8,9 @@ use std::time::Duration;
 use log::trace;
 
 
+/// Uses the winrt api to get access the media player data.
 pub fn get_current_song() -> Result<Song, &'static str> {
+    // TODO: figure out how to get the position of the song
     let manager = MediaManager::RequestAsync().expect("Failed to connect to Windows Media Manager");
     let session = manager.get().expect("Failed to get sessions from Windows Media Manager");
     let current_session = session.GetCurrentSession();
@@ -57,7 +59,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
             source = "spotify"
         } else if origin == "app.ytmd" {
             source = "youtube-music"
-        }    
+        }
     }
     
     let song_metadata = info.get().expect("Failed to unwrap song metadata even if retrieval was successful.");
@@ -68,6 +70,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         album_art: "".to_string(),
         artist_mbid: "".to_string(),
         duration: duration,
+        album: song_metadata.AlbumTitle().expect("Failed to retrieve album from song").to_string(),
         is_repeat: false,
         is_playing: is_playing,
         mbid: "".to_string(),
