@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use types::song::Song;
 use log::trace;
 use mpris::{PlayerFinder, PlaybackStatus};
@@ -100,6 +102,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         mbid: "".to_string(),
         artist_mbid: "".to_string(),
         position: current_player.get_position().unwrap_or_default(),
+        start_time: SystemTime::now(),
         duration: duration,
         is_repeat: false, // will be set afterwards by application logic
         is_playing: playback_status_fmt,

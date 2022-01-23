@@ -52,8 +52,16 @@ impl BaseIntegrationTrait for Lastfm {
         }
         
         if song.is_repeat || !(song.track == last_song.track && song.artist == last_song.artist) {
+            let mut position = last_song.position;
             debug!("Song is on repeat, or song has changed, scrobbling previous, and sending fresh scrobble");
-            if last_song.position < Duration::from_secs(80) {
+            if position == Duration::from_secs(0) {
+                warn!("heck windows!!");
+                // windows heck
+                let diff = song.start_time.duration_since(last_song.start_time).expect("Couldn't calculate diff");
+                warn!("Diff is {:?}", diff);
+                position = diff;
+            }
+            if position < Duration::from_secs(80) {
                 debug!("Last song wasn't longer than 80 seconds, not scrobbling {:?}", last_song.position);
             } else {
                 let mut album = last_song.album.as_str();

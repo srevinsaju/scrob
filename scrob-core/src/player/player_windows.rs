@@ -4,7 +4,9 @@ use types::song::Song;
 use windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager as MediaManager;
 use windows::Media::Control::GlobalSystemMediaTransportControlsSessionPlaybackStatus as MediaStatus;
 use log::warn;
+use windows::Media::MediaTimelineController;
 use std::time::Duration;
+use std::time::SystemTime;
 use log::trace;
 
 
@@ -19,8 +21,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         return Ok(Song::new());
     }
 
-    let current_session = current_session.unwrap();
-
+    let current_session = current_session.expect("Failed to instatiate current session");
     let info = current_session.TryGetMediaPropertiesAsync();
     if let Err(e) = info {
         warn!("No song metadata was received: {}", e);
@@ -32,6 +33,8 @@ pub fn get_current_song() -> Result<Song, &'static str> {
 
     let current_session_playback_info = current_session.GetPlaybackInfo();
     if let Ok(playback_info) = current_session_playback_info {
+        
+        
         is_playing = playback_info.PlaybackStatus().unwrap_or(MediaStatus::Playing) == MediaStatus::Playing;
     } 
 
@@ -47,7 +50,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         position = current_time.into();
     }
 
-    let mut source = "lyrix";
+    let mut source = "lyrix-music";
     if let Ok(origin) = current_session.SourceAppUserModelId() {
         let origin = origin.to_string();
         trace!("Detected song from '{}'", origin);
@@ -63,13 +66,14 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     }
     
     let song_metadata = info.get().expect("Failed to unwrap song metadata even if retrieval was successful.");
-    
+
     let song = Song {
         track: song_metadata.Title().expect("Failed to retrieve title from song").to_string(),
         artist: song_metadata.Artist().expect("Failed to retrieve artist from song").to_string(),
         album_art: "".to_string(),
         artist_mbid: "".to_string(),
         duration: duration,
+        start_time: SystemTime::now(),
         album: song_metadata.AlbumTitle().expect("Failed to retrieve album from song").to_string(),
         is_repeat: false,
         is_playing: is_playing,

@@ -36,7 +36,7 @@ jobs:
       run: |
         RUSTFLAGS='-C link-arg=-s' cargo build --release 
         mkdir _release
-        mv target/release/lyrix-*
+        mv target/release/scrob-*
 
     - uses: actions/upload-artifact@v2
       with:

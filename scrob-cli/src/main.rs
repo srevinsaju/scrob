@@ -2,7 +2,6 @@
 
 use clap::clap_app;
 use config as meta;
-use futures::executor::block_on;
 use log::trace;
 use text_io::read;
 

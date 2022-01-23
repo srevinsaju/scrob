@@ -1,3 +1,6 @@
+
+use std::time::SystemTime;
+
 use log::{debug, info, trace, warn};
 
 
@@ -76,15 +79,17 @@ pub fn main_loop(ctx: Context) {
                         );
                     };
                 }
+                trace!("Calculated duration difference {:?} - {:?}", current_song.start_time, res.start_time);
                 current_song.track = res.track.clone();
                 current_song.artist = res.artist.clone();
                 current_song.album = res.album.clone();
+                current_song.start_time = SystemTime::now();
                 println!("{}\n{}\n{}\n\n", current_song.track.green(), current_song.artist, current_song.album.bold());
 
             } else {
                 // the +3 is to accomodate for latencies on position report
                 let is_repeat =
-                    current_song.position > res.position && current_song.track == res.track;
+                    current_song.position > res.position && current_song.track == res.track && res.artist == current_song.artist;
                 trace!("The song is on repeat?: {}", is_repeat);
 
                 // the song has not changed
@@ -107,6 +112,7 @@ pub fn main_loop(ctx: Context) {
                             );
                         };
                     }
+                    current_song.start_time = SystemTime::now();
                 };
             };
         }

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 
 
@@ -21,6 +21,7 @@ pub struct Song {
     pub artist_mbid: String,
     pub position: Duration,
     pub is_repeat: bool,
+    pub start_time: SystemTime,
 }
 
 impl Song {
@@ -43,6 +44,7 @@ impl Song {
             track: "".to_string(),
             duration: Duration::new(0, 0),
             position: Duration::new(0, 0),
+            start_time: SystemTime::now(),
             scrobble: false,
             url: "".to_string(),
             mbid: "".to_string(),
