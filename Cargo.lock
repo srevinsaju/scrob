@@ -995,9 +995,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.3.7"
+version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fd819562fcebdac5afc5c113c3ec36f902840b70fd4fc458799c8ce4607ae55"
+checksum = "0c9de88456263e249e241fcd211d3954e2c9b0ef7ccfc235a444eb367cae3689"
 dependencies = [
  "bytes 1.1.0",
  "fnv",
@@ -1139,7 +1139,7 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-util",
- "h2 0.3.7",
+ "h2 0.3.10",
  "http 0.2.5",
  "http-body 0.4.4",
  "httparse",
@@ -2226,15 +2226,16 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.7"
+version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07bea77bc708afa10e59905c3d4af7c8fd43c9214251673095ff8b14345fcbc5"
+checksum = "87f242f1488a539a79bac6dbe7c8609ae43b7914b7736210f239a37cccb32525"
 dependencies = [
  "base64 0.13.0",
  "bytes 1.1.0",
  "encoding_rs",
  "futures-core",
  "futures-util",
+ "h2 0.3.10",
  "http 0.2.5",
  "http-body 0.4.4",
  "hyper 0.14.15",
@@ -2372,7 +2373,7 @@ dependencies = [
  "env_logger",
  "futures 0.3.18",
  "log",
- "reqwest 0.11.7",
+ "reqwest 0.11.9",
  "scrob-core",
  "serde",
  "serde_json",
@@ -2394,10 +2395,12 @@ dependencies = [
  "mpris",
  "musicbrainz_rs",
  "notify-rust",
+ "reqwest 0.11.9",
  "rustfm-scrobble",
  "serde",
  "serde_json",
  "types",
+ "urlencoding",
  "windows 0.28.0",
 ]
 
@@ -3076,6 +3079,7 @@ dependencies = [
 name = "types"
 version = "0.1.0"
 dependencies = [
+ "config",
  "serde",
  "serde_json",
 ]
@@ -3181,6 +3185,12 @@ dependencies = [
  "matches",
  "percent-encoding 2.1.0",
 ]
+
+[[package]]
+name = "urlencoding"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68b90931029ab9b034b300b797048cf23723400aa757e8a2bfb9d748102f9821"
 
 [[package]]
 name = "uuid"
