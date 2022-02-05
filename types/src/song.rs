@@ -2,13 +2,15 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::time::{Duration, SystemTime};
 
+use crate::integrations::Players;
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Song {
     pub track: String,
     pub artist: String,
     pub album: String,
     pub is_playing: bool,
-    pub source: String,
+    pub source: Players,
     pub url: String,
     pub scrobble: bool,
     pub duration: Duration,
@@ -35,7 +37,7 @@ impl Song {
             album_art: "".to_string(),
             album: "".to_string(),
             is_playing: false,
-            source: "".to_string(),
+            source: Players::GenericMusicPlayer,
             is_repeat: false,
             track: "".to_string(),
             duration: Duration::new(0, 0),

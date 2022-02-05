@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 
+use crate::integrations::{Integrations, Event};
+
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ScrobConfig {
     pub version: u8,
@@ -16,4 +19,16 @@ impl ::std::default::Default for ScrobConfig {
             username: "".into(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ScrobOperation {
+    pub enabled: bool,
+    pub event: Event,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ScrobMessage {
+    pub integration: Integrations,
+    pub operation: ScrobOperation,
 }

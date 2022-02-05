@@ -1,4 +1,4 @@
-use types::song::Song;
+use types::{song::Song, integrations::Players};
 
 use log::trace;
 use log::warn;
@@ -53,18 +53,18 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         position = current_time.into();
     }
 
-    let mut source = "lyrix-music";
+    let mut source = Players::GenericMusicPlayer;
     if let Ok(origin) = current_session.SourceAppUserModelId() {
         let origin = origin.to_string();
         trace!("Detected song from '{}'", origin);
         if origin.starts_with("Microsoft.ZuneMusic") {
-            source = "groove-music"
+            source = Players::GrooveMusic
         } else if origin == "Chrome" {
-            source = "chrome"
+            source = Players::GenericMusicPlayer
         } else if origin.contains("Spotify") {
-            source = "spotify"
+            source = Players::Spotify
         } else if origin == "app.ytmd" {
-            source = "youtube-music"
+            source = Players::YoutubeMusic
         }
     }
 
@@ -94,7 +94,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         mbid: "".to_string(),
         position: position,
         scrobble: false, // will be set later
-        source: source.into(),
+        source: source,
         url: "".to_string(),
     };
 

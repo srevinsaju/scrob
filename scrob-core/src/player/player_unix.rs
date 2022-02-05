@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use log::trace;
 use mpris::{PlaybackStatus, PlayerFinder};
-use types::song::Song;
+use types::{song::Song, integrations::Players};
 
 /// use linux's mpris dbus data to get the current playing
 /// song from the active player. If the song is originating from
@@ -78,31 +78,36 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     }
     // println!("{:?}", artist);
 
-    let mut source = "";
+    let mut source = Players::GenericMusicPlayer;
     let url = metadata.url().unwrap_or_default().to_string();
     if url.contains("music.youtube.com") {
-        source = "youtube-music";
+        source = Players::YoutubeMusic;
     } else if url.contains("youtube.com") {
-        source = "youtube";
+        source = Players::Youtube;
     } else if url.contains("open.spotify.com") || current_player.bus_name().contains("spotify") {
-        source = "spotify";
+        source = Players::Spotify;
     } else if url.contains("youtube.com") {
-        source = "youtube";
+        source = Players::Youtube;
     } else if current_player
         .bus_name()
         .starts_with("org.mpris.MediaPlayer2.vlc")
     {
-        source = "vlc";
+        source = Players::Vlc;
     } else if current_player
         .bus_name()
         .starts_with("org.mpris.MediaPlayer2.rhythmbox")
     {
-        source = "rhythmbox";
+        source = Players::Rhythmbox;
     } else if current_player
         .bus_name()
         .starts_with("org.mpris.MediaPlayer2.elisa")
     {
-        source = "elisa";
+        source = Players::Elisa;
+    } else if current_player
+        .bus_name()
+        .starts_with("org.mpris.MediaPlayer2.Lollypop")
+    {
+        source = Players::Lollypop;
     }
 
     let duration = metadata.length().unwrap_or_default();
@@ -121,7 +126,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         is_playing: playback_status_fmt,
         scrobble: false, // will be set afterwards
         url: metadata.url().unwrap_or_default().to_string(),
-        source: source.to_string(),
+        source: source,
     };
 
     // println!("{:?}", song);

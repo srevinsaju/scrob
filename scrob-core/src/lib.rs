@@ -1,17 +1,20 @@
 pub mod core;
-use types::config::ScrobConfig;
+use std::collections::HashMap;
+
+use types::{config::ScrobConfig, integrations::Integrations};
 mod integrations;
 pub mod player;
+pub mod mb;
 use crate::integrations::base::BaseIntegrationTrait;
 
 pub struct Context {
-    pub integrations: Vec<Box<dyn BaseIntegrationTrait>>,
+    pub integrations: HashMap<Integrations, Box<dyn BaseIntegrationTrait>>,
     pub config: ScrobConfig,
     pub preferences: Preferences,
 }
 
 #[derive(Debug)]
 pub struct Preferences {
-    pub enable_discord_rich_presence: bool,
-    pub enable_lastfm_scrobble: bool,
+    pub disable_discord_rich_presence: bool,
+    pub disable_lastfm_scrobble: bool,
 }

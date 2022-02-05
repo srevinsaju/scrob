@@ -1,4 +1,4 @@
-use types::song::Song;
+use types::{song::Song, integrations::Players};
 
 use crate::integrations::base::BaseIntegrationTrait;
 
@@ -12,7 +12,7 @@ pub struct Discord {
     ds: Box<dyn DiscordIpc>,
     pub enabled: bool,
     pub connected: bool,
-    last_source: String,
+    last_source: Players,
 }
 
 impl Discord {
@@ -31,7 +31,7 @@ impl Discord {
             ds: discord,
             enabled: true,
             connected: false,
-            last_source: "lyrix".to_string(),
+            last_source: Players::GenericMusicPlayer,
         })
     }
 }
@@ -39,11 +39,14 @@ impl Discord {
 // handles discord integrations and playback activity status
 impl BaseIntegrationTrait for Discord {
     fn set(&mut self, song: Song, _: Song) -> Result<(), Box<dyn Error>> {
+        if song.source == Players::Spotify {
+            return Ok(()) // spotify has their own discord integration 
+        }
         trace!("setting discord integration");
         if !self.connected || self.last_source != song.source {
             // that means we are creating discord rich presence now
             // or either the song source has change, for example youtube music to spotify, etc.
-            self.ds = Discord::safe_discord(meta::discord_app_id(song.source.clone()));
+            self.ds = Discord::safe_discord(song.source.as_discord_app_id());
             self.ds.connect()?;
             self.last_source = song.source.clone();
             self.connected = true;
@@ -59,7 +62,7 @@ impl BaseIntegrationTrait for Discord {
             .large_image(song.source.as_str())
             .large_text(app_desc.as_str())
             .small_text(song.source.as_str())
-            .small_image("lyrix");
+            .small_image("lyrix-music");
 
         let current_time = std::time::SystemTime::now();
         let since_the_epoch = current_time

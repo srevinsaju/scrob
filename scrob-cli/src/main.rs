@@ -17,8 +17,8 @@ fn main() {
         (version: meta::APP_VERSION)
         (author: "Srevin Saju <lyrix+rs@srev.in>")
         (about: "Open Source Music Network")
-        (@arg discord: --discord "Enable discord integration")
-        (@arg lastfm_scrobble: --("lastfm-scrobble") "Enable scrobble support")
+        (@arg disable_discord: --("no-discord") "Disable discord integration")
+        (@arg disable_scrobble: --("no-scrobble") "Disable scrobble support")
         (@subcommand login =>
             (about: "Login/re-login to Lyrix")
         )
@@ -51,8 +51,8 @@ fn main() {
     }
 
     let prefs = Preferences {
-        enable_discord_rich_presence: matches.is_present("discord"),
-        enable_lastfm_scrobble: matches.is_present("lastfm_scrobble"),
+        disable_discord_rich_presence: matches.is_present("disable_discord"),
+        disable_lastfm_scrobble: matches.is_present("disable_scrobble"),
     };
     trace!("Preferences: {:?}", prefs);
 

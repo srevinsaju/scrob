@@ -14,8 +14,10 @@ futures = "0.3"
 notify-rust = { version = "4", features = ["images"] }
 rustfm-scrobble = "1.1.1"
 confy = "0.4.0"
+reqwest = "0.11.9"
 ctrlc = { version = "3.0", features = ["termination"] }
 musicbrainz_rs = "0.4.0"
+urlencoding = "2.1.0"
 
 config = { path = "../config" }
 types = { path = "../types" }
