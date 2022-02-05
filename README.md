@@ -1,5 +1,26 @@
-# scrob
-Universal last.fm scrobbler 
+<p align="center">
+    <img src="https://github.com/lyrix-music/cli/blob/main/cmd/desktop/AppDir/lyrix-desktop.png?raw=true" alt="scrob" width=128 height=128>
+
+<h2 align="center">🎶 Scrob</h2>
+
+  <p align="center">
+    Universal last.fm scrobbler 
+    <br>
+    <a href="https://github.com/srevinsaju/scrob/issues/new">Report bug</a>
+    ·
+    <a href="https://github.com/srevinsaju/scrob/issues/new">Request feature</a>
+  </p>
+</p>
+
+<div align="center">
+
+[![forthebadge made-with-rust](http://ForTheBadge.com/images/badges/made-with-rust.svg)](https://rust.org/)<br/><br/>
+
+
+[![GitHub followers](https://img.shields.io/github/followers/srevinsaju?label=Follow%20me&style=social)](https://github.com/srevinsaju) [![GitHub stars](https://img.shields.io/github/stars/srevinsaju/scrob?style=social)](https://github.com/srevinsaju/scrob/stargazers)
+
+</div>
+
 
 ## Getting started 
 
