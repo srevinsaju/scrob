@@ -71,7 +71,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
         trace!("Received pre-parsed song {:?}", res);
 
 
-        res.scrobble = ctx.preferences.enable_lastfm_scrobble;
+        res.scrobble = !ctx.preferences.disable_lastfm_scrobble;
 
         if res.track == "" || !res.is_playing {
             for (k, v) in integrations.iter_mut() {
