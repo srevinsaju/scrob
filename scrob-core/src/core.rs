@@ -5,8 +5,6 @@ use std::time::SystemTime;
 
 use log::{debug, info, trace, warn};
 
-use notify_rust::Notification as Ntfn;
-
 use colored::*;
 use config as meta;
 
@@ -182,22 +180,6 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
         trace!("Sleeping for {} seconds", INTERVAL);
         std::thread::sleep(std::time::Duration::from_millis(INTERVAL));
     }
-}
-
-pub fn launch_notification() {
-    Ntfn::new()
-        .summary("click me")
-        .action("default", "default")
-        .action("clicked", "click here")
-        .show()
-        .unwrap()
-        .wait_for_action(|action| match action {
-            "default" => println!("you clicked \"default\""),
-            "clicked" => println!("that was correct"),
-            // here "__closed" is a hard coded keyword
-            "__closed" => println!("the notification was closed"),
-            _ => (),
-        });
 }
 
 /// loads all the configuration and parses the preferences.
