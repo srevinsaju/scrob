@@ -1,6 +1,8 @@
-use config::{DISCORD_APPID_ELISA, DISCORD_APPID_SPOTIFY, DISCORD_APPID_YOUTUBE_MUSIC, DISCORD_APPID_YOUTUBE, DISCORD_APPID_LOLLYPOP, DISCORD_APPID_GENERIC, DISCORD_APPID_GROOVE_MUSIC};
-use serde::{Serialize, Deserialize};
-
+use config::{
+    DISCORD_APPID_ELISA, DISCORD_APPID_GENERIC, DISCORD_APPID_GROOVE_MUSIC, DISCORD_APPID_LOLLYPOP,
+    DISCORD_APPID_SPOTIFY, DISCORD_APPID_YOUTUBE, DISCORD_APPID_YOUTUBE_MUSIC,
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Integrations {
@@ -10,7 +12,6 @@ pub enum Integrations {
     Notification,
 }
 
-
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Event {
     SongChanged,
@@ -18,8 +19,6 @@ pub enum Event {
     SongPlaying,
     NoMediaPlayer,
 }
-
-
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Players {
@@ -45,7 +44,7 @@ impl Players {
             Players::Vlc => "vlc",
             Players::GenericMusicPlayer => "music",
             Players::Rhythmbox => "rhythmbox",
-            Players::GrooveMusic => "groove-music"
+            Players::GrooveMusic => "groove-music",
         }
     }
 
@@ -59,7 +58,7 @@ impl Players {
             Players::Vlc => "VLC",
             Players::GenericMusicPlayer => "Music",
             Players::Rhythmbox => "Rhythmbox",
-            Players::GrooveMusic => "Groove Music"
+            Players::GrooveMusic => "Groove Music",
         }
     }
 

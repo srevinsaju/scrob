@@ -1,4 +1,4 @@
-use types::{song::Song, integrations::Players};
+use types::{integrations::Players, song::Song};
 
 use log::trace;
 use log::warn;

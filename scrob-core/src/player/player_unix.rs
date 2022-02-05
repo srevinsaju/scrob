@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use log::trace;
 use mpris::{PlaybackStatus, PlayerFinder};
-use types::{song::Song, integrations::Players};
+use types::{integrations::Players, song::Song};
 
 /// use linux's mpris dbus data to get the current playing
 /// song from the active player. If the song is originating from

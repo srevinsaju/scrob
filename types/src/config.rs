@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::integrations::{Integrations, Event};
-
+use crate::integrations::{Event, Integrations};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ScrobConfig {

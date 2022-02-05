@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::sync::mpsc::channel;
 use std::sync::mpsc::Receiver;
 use std::time::SystemTime;
-use std::sync::mpsc::channel;
 
 use log::{debug, info, trace, warn};
 
@@ -12,19 +12,17 @@ use config as meta;
 
 use types::config::ScrobConfig;
 use types::config::ScrobMessage;
-use types::song::Song;
 use types::integrations::Integrations;
+use types::song::Song;
 
 use crate::integrations::base::BaseIntegrationTrait;
 use crate::integrations::discord::Discord;
 use crate::integrations::lastfm::Lastfm;
 use crate::integrations::notification::Notification;
+use crate::mb::search_musicbrainz;
 use crate::player;
 use crate::Context;
 use crate::Preferences;
-use crate::mb::search_musicbrainz;
-
-
 
 const INTERVAL: u64 = 2000;
 
@@ -35,8 +33,6 @@ const INTERVAL: u64 = 2000;
 /// This is repeated for every plugin which is enabled by the command
 /// line arguments or the context provided as the first argument `Context`
 pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
-    
-
     let mut current_song = Song::new();
 
     let mut integrations = ctx.integrations;
@@ -50,8 +46,14 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
             let msg = rx.recv().unwrap();
             debug!("Received message {:?}", msg);
             if integrations.contains_key(&msg.integration) {
-                debug!("Toggling integration {:?} with {:?}", msg.integration, msg.operation.enabled);
-                integrations.get_mut(&msg.integration).unwrap().set_enabled(msg.operation.enabled);
+                debug!(
+                    "Toggling integration {:?} with {:?}",
+                    msg.integration, msg.operation.enabled
+                );
+                integrations
+                    .get_mut(&msg.integration)
+                    .unwrap()
+                    .set_enabled(msg.operation.enabled);
             }
         }
 
@@ -69,7 +71,6 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
         let mut res = res.unwrap();
 
         trace!("Received pre-parsed song {:?}", res);
-
 
         res.scrobble = !ctx.preferences.disable_lastfm_scrobble;
 
@@ -100,7 +101,6 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
 
                 trace!("Received post-parsed song {:?}", postproecessed_res);
 
-
                 // the song has changed or the song was paused previously, but now started playing
                 for (k, v) in integrations.iter_mut() {
                     if let Err(err) = v.set(postproecessed_res.clone(), current_song.clone()) {
@@ -122,7 +122,9 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                 current_song.album = res.album.clone();
                 current_song.start_time = SystemTime::now();
 
-                if postproecessed_res.track != current_song.track || postproecessed_res.artist != current_song.artist {
+                if postproecessed_res.track != current_song.track
+                    || postproecessed_res.artist != current_song.artist
+                {
                     println!(
                         "{} ~> {}\n{} ~> {}\n{} ~> {}\n\n",
                         current_song.track.bright_black(),
@@ -139,10 +141,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                         current_song.artist,
                         current_song.album.bold()
                     );
-
                 }
-
-                
             } else {
                 // the +3 is to accomodate for latencies on position report
                 let is_repeat = current_song.position > res.position
@@ -185,20 +184,20 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
     }
 }
 
-
 pub fn launch_notification() {
-    Ntfn::new().summary("click me")
-                   .action("default", "default")
-                   .action("clicked", "click here")
-                   .show()
-                   .unwrap()
-                   .wait_for_action(|action| match action {
-                                        "default" => println!("you clicked \"default\""),
-                                        "clicked" => println!("that was correct"),
-                                        // here "__closed" is a hard coded keyword
-                                        "__closed" => println!("the notification was closed"),
-                                        _ => ()
-                                    });
+    Ntfn::new()
+        .summary("click me")
+        .action("default", "default")
+        .action("clicked", "click here")
+        .show()
+        .unwrap()
+        .wait_for_action(|action| match action {
+            "default" => println!("you clicked \"default\""),
+            "clicked" => println!("that was correct"),
+            // here "__closed" is a hard coded keyword
+            "__closed" => println!("the notification was closed"),
+            _ => (),
+        });
 }
 
 /// loads all the configuration and parses the preferences.
@@ -240,7 +239,6 @@ pub fn core(prefs: Preferences) {
         config: cfg,
         preferences: prefs,
     };
-
 
     let (_, rx) = channel();
     info!("Listening to songs! 🎶");

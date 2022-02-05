@@ -1,4 +1,4 @@
-use types::{song::Song, integrations::Players};
+use types::{integrations::Players, song::Song};
 
 use crate::integrations::base::BaseIntegrationTrait;
 
@@ -40,7 +40,7 @@ impl Discord {
 impl BaseIntegrationTrait for Discord {
     fn set(&mut self, song: Song, _: Song) -> Result<(), Box<dyn Error>> {
         if song.source == Players::Spotify {
-            return Ok(()) // spotify has their own discord integration 
+            return Ok(()); // spotify has their own discord integration
         }
         trace!("setting discord integration");
         if !self.connected || self.last_source != song.source {
