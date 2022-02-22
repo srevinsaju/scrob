@@ -56,6 +56,11 @@ cargo build
 target/debug/scrob --help
 ```
 
+![Discord Lollypop](./docs/img/discord_lollypop.png) ![Discord Youtube music](./docs/img/discord_ytmusic.png) 
+![Command line](./docs/img/cli.png)
+
+
+
 ## License 
 [This repository](https://github.com/srevinsaju/scrob) is licensed
 under the MIT license. For more information, see [LICENSE](./LICENSE).
