@@ -66,7 +66,7 @@ impl Players {
         match *self {
             Players::Spotify => DISCORD_APPID_SPOTIFY,
             Players::YoutubeMusic => DISCORD_APPID_YOUTUBE_MUSIC,
-            Players::Youtube => DISCORD_APPID_GENERIC,
+            Players::Youtube => DISCORD_APPID_YOUTUBE,
             Players::Lollypop => DISCORD_APPID_LOLLYPOP,
             Players::Vlc => DISCORD_APPID_GENERIC,
             Players::Elisa => DISCORD_APPID_ELISA,

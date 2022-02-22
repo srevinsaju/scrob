@@ -58,6 +58,7 @@ impl BaseIntegrationTrait for Discord {
         }
 
         let app_desc = format!("{} {}", meta::APP_NAME, meta::APP_VERSION);
+        trace!("setting discord activity with image '{}' and app desc '{}'", song.source.as_str(), app_desc);
         let assets = activity::Assets::new()
             .large_image(song.source.as_str())
             .large_text(app_desc.as_str())
