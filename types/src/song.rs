@@ -12,6 +12,7 @@ pub struct Song {
     pub is_playing: bool,
     pub source: Players,
     pub url: String,
+    pub app_id: String,
     pub scrobble: bool,
     pub duration: Duration,
     pub album_art: String,
@@ -33,6 +34,7 @@ impl Song {
     /// creates an empty song instance with defaults for all fields
     pub fn new() -> Song {
         Song {
+            app_id: "".to_string(),
             artist: "".to_string(),
             album_art: "".to_string(),
             album: "".to_string(),

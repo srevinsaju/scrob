@@ -125,7 +125,13 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         is_repeat: false, // will be set afterwards by application logic
         is_playing: playback_status_fmt,
         scrobble: false, // will be set afterwards
-        url: metadata.url().unwrap_or_default().to_string(),
+
+        // uses the URL from the player by default, or uses the bus name as an ID
+        url: metadata
+            .url()
+            .unwrap_or(current_player.bus_name().to_string().as_str())
+            .to_string(),
+        app_id: current_player.bus_name().to_string(),
         source: source,
     };
 

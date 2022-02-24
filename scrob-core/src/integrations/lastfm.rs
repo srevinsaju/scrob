@@ -1,13 +1,18 @@
-use log::{debug, trace, warn};
-use types::song::Song;
+use log::{debug, info, trace, warn};
+use types::{config::LastfmSettings, song::Song};
 
 use crate::integrations::base::BaseIntegrationTrait;
 use std::{error::Error, time::Duration};
+
+use regex::Regex;
 
 use rustfm_scrobble::{Scrobble, Scrobbler};
 
 /// Lastfm integration settings
 pub struct Lastfm {
+    /// private scrobbler settings instance to read the config
+    cfg: LastfmSettings,
+
     /// private scrobbler instance authenticated with username and password using the `new` method
     scrobbler: Scrobbler,
 
@@ -17,14 +22,15 @@ pub struct Lastfm {
 
 impl Lastfm {
     /// creates a new Lastfm integration with a username and password and returns a new `Lastfm` instance
-    pub fn new(username: String, password: String) -> Result<Lastfm, &'static str> {
+    pub fn new(cfg: LastfmSettings) -> Result<Lastfm, &'static str> {
         // do not use username and password here, but instead move to a different
         // authentication system
         let mut scrobbler = Scrobbler::new(config::LASTFM_APP_ID, config::LASTFM_APP_SECRET);
         scrobbler
-            .authenticate_with_password(username.as_str(), password.as_str())
+            .authenticate_with_password(cfg.username.as_str(), cfg.password.as_str())
             .expect("Failed to authenticate with Last.fm");
         Ok(Lastfm {
+            cfg: cfg,
             enabled: true,
             scrobbler: scrobbler,
         })
@@ -41,6 +47,50 @@ impl BaseIntegrationTrait for Lastfm {
     /// If the song is detected as one which was played on repeat by the `main_loop`, it is scrobbled
     /// first, and then set with "now playing" status.
     fn set(&mut self, song: Song, last_song: Song) -> Result<(), Box<dyn Error>> {
+        if self
+            .cfg
+            .clone()
+            .blacklist_apps
+            .contains(&song.source.as_str().to_string())
+        {
+            info!(
+                "Skipping {} from source '{}' because it was in blacklisted apps",
+                song.track,
+                song.source.as_str()
+            );
+            return Ok(());
+        }
+
+        for v in self.cfg.clone().blacklist_urls.iter() {
+            let re = Regex::new(v).expect("Failed to parse regex pattern");
+            debug!(
+                "Checking '{}' against regex pattern '{}', result: {}",
+                song.url.as_str(),
+                v,
+                re.is_match(&song.url.as_str())
+            );
+            if re.is_match(&song.url.as_str()) {
+                info!(
+                    "Skipping '{}' because url '{}' matched regex pattern '{}'",
+                    song.track, song.url, v
+                );
+                return Ok(());
+            }
+        }
+
+        if self
+            .cfg
+            .clone()
+            .blacklist_ids
+            .contains(&song.app_id.as_str().to_string())
+        {
+            info!(
+                "Skipping {} from source '{}' because it was in blacklisted applications ids",
+                song.track, song.app_id
+            );
+            return Ok(());
+        }
+
         trace!("Set now playing on last.fm");
         if last_song.track != song.track {
             debug!(
@@ -53,13 +103,12 @@ impl BaseIntegrationTrait for Lastfm {
             let mut position = last_song.position;
             debug!("Song is on repeat, or song has changed, scrobbling previous, and sending fresh scrobble");
             if position == Duration::from_secs(0) {
-                warn!("heck windows!!");
-                // windows heck
+                // windows hack
                 let diff = song
                     .start_time
                     .duration_since(last_song.start_time)
                     .expect("Couldn't calculate diff");
-                warn!("Diff is {:?}", diff);
+                trace!("time difference is {:?}", diff);
                 position = diff;
             }
             if position < Duration::from_secs(80) {

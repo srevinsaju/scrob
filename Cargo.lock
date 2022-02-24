@@ -2427,6 +2427,7 @@ dependencies = [
  "mpris",
  "musicbrainz_rs",
  "notify-rust",
+ "regex",
  "reqwest 0.11.9",
  "rustfm-scrobble",
  "serde",

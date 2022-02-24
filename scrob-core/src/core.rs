@@ -204,15 +204,16 @@ pub fn core(prefs: Preferences) {
     integrations.insert(Integrations::Notification, Box::new(notifs));
 
     if !prefs.disable_discord_rich_presence {
+        let cfg = cfg.clone();
         info!("Connecting to discord...");
-        let ds = Discord::new().unwrap();
+        let ds = Discord::new(cfg.discord).unwrap();
         integrations.insert(Integrations::Discord, Box::new(ds));
     }
 
     if !prefs.disable_lastfm_scrobble {
         info!("Connecting to last.fm...");
         let cfg = cfg.clone();
-        let lastfm = Lastfm::new(cfg.username, cfg.password).unwrap();
+        let lastfm = Lastfm::new(cfg.lastfm).unwrap();
         integrations.insert(Integrations::Lastfm, Box::new(lastfm));
     }
 

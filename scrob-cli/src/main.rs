@@ -50,12 +50,12 @@ fn main() {
 
         println!("Login details saved to config folder");
 
-        let cfg = ScrobConfig {
-            version: 1,
-            password: password,
-            username: username,
+        let mut cfg = ScrobConfig {
+            version: 2,
             ..Default::default()
         };
+        cfg.lastfm.username = username;
+        cfg.lastfm.password = password;
 
         confy::store("scrob", &cfg).expect("Failed to store config");
         return;

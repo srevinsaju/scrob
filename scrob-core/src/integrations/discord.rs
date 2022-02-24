@@ -1,13 +1,15 @@
-use types::{integrations::Players, song::Song};
+use types::{config::DiscordSettings, integrations::Players, song::Song};
 
 use crate::integrations::base::BaseIntegrationTrait;
 
 use config as meta;
 use discord_rich_presence::{activity, new_client, DiscordIpc};
-use log::{trace, warn};
+use log::{debug, info, trace, warn};
+use regex::Regex;
 use std::{error::Error, time::UNIX_EPOCH};
 
 pub struct Discord {
+    cfg: DiscordSettings,
     pub application_id: String,
     ds: Box<dyn DiscordIpc>,
     pub enabled: bool,
@@ -21,12 +23,13 @@ impl Discord {
         return Box::new(discord);
     }
 
-    pub fn new() -> Result<Discord, &'static str> {
+    pub fn new(cfg: DiscordSettings) -> Result<Discord, &'static str> {
         // handle error here
 
         let discord = Discord::safe_discord(meta::DISCORD_APPID_GENERIC);
 
         Ok(Discord {
+            cfg: cfg,
             application_id: meta::DISCORD_APPID_GENERIC.to_string(),
             ds: discord,
             enabled: true,
@@ -39,9 +42,50 @@ impl Discord {
 // handles discord integrations and playback activity status
 impl BaseIntegrationTrait for Discord {
     fn set(&mut self, song: Song, _: Song) -> Result<(), Box<dyn Error>> {
-        if song.source == Players::Spotify {
-            return Ok(()); // spotify has their own discord integration
+        if self
+            .cfg
+            .clone()
+            .blacklist_apps
+            .contains(&song.source.as_str().to_string())
+        {
+            info!(
+                "Skipping {} from source '{}' because it was in blacklisted apps",
+                song.track,
+                song.source.as_str()
+            );
+            return Ok(());
         }
+
+        for v in self.cfg.clone().blacklist_urls.iter() {
+            let re = Regex::new(v).expect("Failed to parse regex pattern");
+            debug!(
+                "Checking '{}' against regex pattern '{}', result: {}",
+                song.url.as_str(),
+                v,
+                re.is_match(&song.url.as_str())
+            );
+            if re.is_match(&song.url.as_str()) {
+                info!(
+                    "Skipping '{}' because url '{}' matched regex pattern '{}'",
+                    song.track, song.url, v
+                );
+                return Ok(());
+            }
+        }
+
+        if self
+            .cfg
+            .clone()
+            .blacklist_ids
+            .contains(&song.app_id.as_str().to_string())
+        {
+            info!(
+                "Skipping {} from source '{}' because it was in blacklisted applications ids",
+                song.track, song.app_id
+            );
+            return Ok(());
+        }
+
         trace!("setting discord integration");
         if !self.connected || self.last_source != song.source {
             // that means we are creating discord rich presence now
