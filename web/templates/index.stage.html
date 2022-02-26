@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">
+      Scrob
+    </h1>
+    <h2 class="subtitle">
+      Open source music network
+    </h2>
+    
+    
+    <div style="padding-bottom: 1em;">
+      <img id="playerIcon" style="height: 2em; font-size: 1.25em; vertical-align: middle; display: inline-block;" src="https://cdn.discordapp.com/app-assets/934740230538407968/934779215369351228.png"></img>
+      <div id="playerBlock" class="control" style="vertical-align: middle; display: inline-block; height: 100%; padding-left: 0.25em;">
+        <input class="input disabled" type="text" 
+              id="playerName"
+              placeholder="Player Name" 
+              value="No Player Detected"
+              style="border: none; border: transparent; border-width: 0; background-color: transparent; box-shadow: none; padding: 0; height: 100%">
+        <!--p id="playerName" style="height: 100%; font-size: 1em; display: inline-block;">No player detected</p-->
+        <p id="editPlayer" style="height: 100%; font-size: 0.6em; display: block;">Trying to detect players...</p>
+      </div>
+      
+    </div>
+
+  
+    <div id="scrobbleSwitchDiv" class="field">
+      <input id="scrobbleSwitch" type="checkbox" name="scrobbleSwitch"
+             class="switch is-rounded is-primary requires-auth" checked>
+      <label for="scrobbleSwitch">Scrobble</label>
+    </div>
+    <div id="discordSwitchDiv" class="field">
+      <input id="discordSwitch" type="checkbox" name="scrobbleSwitch"
+             class="switch is-rounded is-primary requires-auth" checked>
+      <label for="discordSwitch">Discord Rich Presence</label>
+    </div>
+
+    <br>
+
+  </div>
+</section>
+
+
+{% endblock %}
