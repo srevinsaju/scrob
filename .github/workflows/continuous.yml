@@ -24,6 +24,7 @@ jobs:
     - uses: actions/setup-node@v2
 
     - name: Generate Web Assets 
+      shell: bash
       run: |
         cd web
         yarn install
