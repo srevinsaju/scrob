@@ -2,7 +2,7 @@ pub mod core;
 use std::collections::HashMap;
 
 use types::{config::ScrobConfig, integrations::Integrations};
-mod integrations;
+pub mod integrations;
 pub mod mb;
 pub mod player;
 use crate::integrations::base::BaseIntegrationTrait;

@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use log::trace;
+use log::{trace, warn};
 use mpris::{PlaybackStatus, PlayerFinder};
 use types::{integrations::Players, song::Song};
 
@@ -22,9 +22,12 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     }
     let players = players.unwrap();
 
-    let mut current_player = player_instance
-        .find_active()
-        .expect("Could not find active player");
+    let current_player = player_instance.find_active();
+    if current_player.is_err() {
+        warn!("{:?}", current_player.err());
+        return Err("Couldn't find active player");
+    }
+    let mut current_player = current_player.unwrap();
 
     trace!("Active player: {}", current_player.bus_name());
 

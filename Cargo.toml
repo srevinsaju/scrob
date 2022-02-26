@@ -3,7 +3,8 @@ members = [
   "config",
   "scrob-cli",
   "scrob-core",
-  "types"
+  "types",
+  "scrob-gui",
 ]
 resolver = "2"
 

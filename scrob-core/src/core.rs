@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Receiver;
+use std::sync::mpsc::Sender;
 use std::time::SystemTime;
 
 use log::{debug, info, trace, warn};
@@ -8,9 +9,11 @@ use log::{debug, info, trace, warn};
 use colored::*;
 use config as meta;
 
+use types::config::OperationType;
 use types::config::ScrobConfig;
 use types::config::ScrobMessage;
 use types::integrations::Integrations;
+use types::integrations::Players;
 use types::song::Song;
 
 use crate::integrations::base::BaseIntegrationTrait;
@@ -30,28 +33,59 @@ const INTERVAL: u64 = 2000;
 /// the .release event is triggered.
 /// This is repeated for every plugin which is enabled by the command
 /// line arguments or the context provided as the first argument `Context`
-pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
+pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>, song_events_sender: Sender<Song>) {
     let mut current_song = Song::new();
+    let mut custom_player_set = false;
+    let mut custom_player = Players::GenericMusicPlayer;
 
     let mut integrations = ctx.integrations;
 
     debug!("Starting main loop");
     loop {
         // main loop
+        let mut force = false;
         trace!("Checking for new song");
+        let data = rx.try_recv();
+        if data.is_ok() {
+            let msg = data.unwrap();
+            debug!("Received message from mpsc channel {:?}", msg);
+            match msg.operation.type_ {
+                OperationType::Event => todo!(),
+                OperationType::CustomPlayer => {
+                    custom_player_set = msg.operation.enabled;
+                    force = true;
+                    if custom_player_set {
+                        custom_player = msg.operation.custom_player;
+                    } else {
+                        custom_player = Players::GenericMusicPlayer;
+                    }
+                }
+                OperationType::Integration => {
+                    if integrations.contains_key(&msg.operation.integration) {
+                        debug!(
+                            "Toggling integration {:?} with {:?}",
+                            msg.operation.integration, msg.operation.enabled
+                        );
 
-        if rx.try_recv().is_ok() {
-            let msg = rx.recv().unwrap();
-            debug!("Received message {:?}", msg);
-            if integrations.contains_key(&msg.integration) {
-                debug!(
-                    "Toggling integration {:?} with {:?}",
-                    msg.integration, msg.operation.enabled
-                );
-                integrations
-                    .get_mut(&msg.integration)
-                    .unwrap()
-                    .set_enabled(msg.operation.enabled);
+                        // set the integrationto be enabled or disabled
+                        // so that on the next iteration, they take effect
+                        integrations
+                            .get_mut(&msg.operation.integration)
+                            .unwrap()
+                            .set_enabled(msg.operation.enabled);
+
+                        if !msg.operation.enabled {
+                            // disable the currently targetted integration
+                            let _ = integrations
+                                .get_mut(&msg.operation.integration)
+                                .unwrap()
+                                .release(current_song.clone());
+                        } else {
+                            force = true;
+                        }
+                    }
+                }
+                OperationType::Null => {}
             }
         }
 
@@ -73,7 +107,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
         res.scrobble = !ctx.preferences.disable_lastfm_scrobble;
 
         if res.track == "" || !res.is_playing {
-            for (k, v) in integrations.iter_mut() {
+            for (_, v) in integrations.iter_mut() {
                 if !v.enabled() {
                     continue;
                 }
@@ -87,10 +121,15 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
             }
         }
 
-        if res.is_playing {
-            if current_song.track != res.track
+        if custom_player_set {
+            res.source = custom_player;
+        }
+
+        if res.is_playing || force {
+            if (current_song.track != res.track
                 || current_song.artist != res.artist
-                || current_song.is_playing != res.is_playing
+                || current_song.is_playing != res.is_playing)
+                || force
             {
                 info!(".set triggered for {}", res.track);
 
@@ -100,7 +139,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                 trace!("Received post-parsed song {:?}", postproecessed_res);
 
                 // the song has changed or the song was paused previously, but now started playing
-                for (k, v) in integrations.iter_mut() {
+                for (_, v) in integrations.iter_mut() {
                     if let Err(err) = v.set(postproecessed_res.clone(), current_song.clone()) {
                         warn!(
                             "Error when trying to update song in integration '{}': {}",
@@ -119,6 +158,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                 current_song.artist = res.artist.clone();
                 current_song.album = res.album.clone();
                 current_song.start_time = SystemTime::now();
+                let _ = song_events_sender.send(res.clone());
 
                 if postproecessed_res.track != current_song.track
                     || postproecessed_res.artist != current_song.artist
@@ -150,6 +190,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                 // the song has not changed
                 if is_repeat {
                     trace!("The song is on repeat!!, {:?} {:?}", current_song, res);
+                    let _ = song_events_sender.send(res.clone());
                     println!(
                         "{}\n{}\n{}\non Repeat.\n\n",
                         current_song.track.green(),
@@ -157,7 +198,7 @@ pub fn main_loop(ctx: Context, rx: Receiver<ScrobMessage>) {
                         current_song.album.bold(),
                     );
                     res.is_repeat = true;
-                    for (k, v) in integrations.iter_mut() {
+                    for (_, v) in integrations.iter_mut() {
                         if !v.enabled() {
                             continue;
                         }
@@ -224,6 +265,7 @@ pub fn core(prefs: Preferences) {
     };
 
     let (_, rx) = channel();
+    let (song_events_sender, _) = channel();
     info!("Listening to songs! 🎶");
-    main_loop(ctx, rx);
+    main_loop(ctx, rx, song_events_sender);
 }
