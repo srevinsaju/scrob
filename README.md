@@ -19,6 +19,8 @@
 
 [![GitHub followers](https://img.shields.io/github/followers/srevinsaju?label=Follow%20me&style=social)](https://github.com/srevinsaju) [![GitHub stars](https://img.shields.io/github/stars/srevinsaju/scrob?style=social)](https://github.com/srevinsaju/scrob/stargazers)
 
+![Scrob GUI](./docs/img/gui.png)
+
 </div>
 
 
