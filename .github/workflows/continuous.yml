@@ -20,6 +20,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+    - uses: actions/setup-node@v2
+
+    - name: Generate Web Assets 
+      run: |
+        cd web
+        yarn install
+        yarn run setup:dev 
+        yarn run static
+        yarn run build
 
     - name: Dependencies (Linux)
       if: matrix.os == 'ubuntu'
@@ -29,9 +39,6 @@ jobs:
       if: matrix.os == 'windows'
       run: echo "nothing here"
 
-
-    - name: Build
-      run: cargo build
     - name: Build (optimzed)
       env: 
         RUSTFLAGS: "-C link-arg=-s"
