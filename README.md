@@ -23,18 +23,34 @@
 
 </div>
 
-
-## Getting started 
+## Desktop App
+### Getting Started
 
 Download a binary from the releases for your appropriate architecture 
 and OS. Currently, only Windows and Linux are supported. 
 
+See [Login](#Login) for details on logging into this service. 
+
+Run the app, and it should try to start detecting songs.
+If the app doesn't recognize the music provider correctly,
+(for example if it shows "Music" instead of "Youtube Music")
+when using the browser, you can edit the name of the app 
+dynamically, it should get reflected on the Discord Rich Presence.
+
+## Command Line Interface
+
+### Getting Started 
+
+Download a binary from the releases for your appropriate architecture 
+and OS. Currently, only Windows and Linux are supported. 
+
+#### Login
 ```bash
 scrob login
 ```
 Login with your `last.fm` username and password.
 
-## Usage 
+### Usage 
 
 To scrobble your songs to last.fm, just do
 ```bash
@@ -50,7 +66,7 @@ The latter is very useful when you need to debug scrob
 without having it to mess up your last.fm scrobbles. 
 
 
-## Build
+### Build
 `scrob` is built on Rust, and uses `cargo`.
 
 ```bash
