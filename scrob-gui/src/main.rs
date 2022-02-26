@@ -25,13 +25,32 @@ use wry::{
     webview::WebViewBuilder,
 };
 
+#[cfg(unix)]
 static BUNDLE_JS: &'static [u8] = include_bytes!("../../web/dist/js/bundle.js");
+#[cfg(windows)]
+static BUNDLE_JS: &'static [u8] = include_bytes!(r"..\..\web\dist\js\bundle.js");
+
+#[cfg(unix)]
 static STATIC_CSS_SCROB: &'static [u8] = include_bytes!("../../web/dist/static/css/common.css");
+#[cfg(windows)]
+static STATIC_CSS_SCROB: &'static [u8] = include_bytes!(r"..\..\web\dist\static\css\common.css");
+
+#[cfg(unix)]
 static STATIC_CSS_COMMON: &'static [u8] = include_bytes!("../../web/dist/static/css/lyrix.css");
+#[cfg(windows)]
+static STATIC_CSS_COMMON: &'static [u8] = include_bytes!(r"..\..\web\dist\static\css\lyrix.css");
+
+#[cfg(unix)]
 static SCROB_LOGO: &'static [u8] = include_bytes!("../../web/dist/static/lyrix-desktop.png");
+#[cfg(windows)]
+static SCROB_LOGO: &'static [u8] = include_bytes!(r"..\..\web\dist\static\lyrix-desktop.png");
 
 fn main() {
+
+    #[cfg(unix)]
     let index_html = include_str!("../../web/dist/index.html");
+    #[cfg(windows)]
+    let index_html = include_str!(r"..\..\web\dist\index.html");
 
     enum UserEvents {
         CloseWindow(WindowId),
