@@ -8,3 +8,5 @@ FROM mcr.microsoft.com/vscode/devcontainers/rust:0-${VARIANT}
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends qtbase5-dev pkg-config \
     qtdeclarative5-dev libdbus-1-dev qt5-qmake
+
+RUN cargo install rust-analyzer

@@ -57,10 +57,16 @@ function registerLoginButtonCallback() {
 function playerEditorClickHandler(event: Event) {
     let targetElement = document.getElementById('editPlayer')
     // @ts-ignore:
-    window.ipc.postMessage('playerChangeReset')
+    postMessage('playerChangeReset')
     console.log("Requesting backend to fallback to autodetection.")
     targetElement.textContent = "Listening to songs"
     targetElement.removeEventListener('click', playerEditorClickHandler)
+}
+
+function postMessage(message: string) {
+    fetch(`http://localhost:8000/events/status/${message}`).catch(function(e) {
+        console.log("Failed sending state", e)
+    })
 }
 
 function onDefaultPageLoadCallback() {
@@ -68,10 +74,10 @@ function onDefaultPageLoadCallback() {
     scrobbleSwitch.addEventListener('change', function(evt) {
         if (scrobbleSwitch.checked) {
             // @ts-ignore: 
-            window.ipc.postMessage('scrobbleSwitchEnabled');
+            postMessage('scrobbleSwitchEnabled');
         } else {
             // @ts-ignore: 
-            window.ipc.postMessage('scrobbleSwitchDisabled');
+            postMessage('scrobbleSwitchDisabled');
         }
 
     })
@@ -79,10 +85,10 @@ function onDefaultPageLoadCallback() {
     discordSwitch.addEventListener('change', function(evt) {
         if (discordSwitch.checked) {
             // @ts-ignore: 
-            window.ipc.postMessage('discordSwitchEnabled');
+            postMessage('discordSwitchEnabled');
         } else {
             // @ts-ignore: 
-            window.ipc.postMessage('discordSwitchDisabled');
+            postMessage('discordSwitchDisabled');
         }
 
     })
@@ -102,7 +108,7 @@ function onDefaultPageLoadCallback() {
                     lastChosenCustomPlayer = players[i].name;
                      // send a request to the backend to change the configured player
                     // @ts-ignore:
-                    window.ipc.postMessage(`playerChangeRequested:${players[i].name}`)
+                    postMessage(`playerChangeRequested:${players[i].name}`)
                     playerEditor.textContent = "Overriding player details. Reset?"
                     
                     playerEditor.addEventListener('click', playerEditorClickHandler)

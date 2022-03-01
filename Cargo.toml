@@ -4,7 +4,8 @@ members = [
   "scrob-cli",
   "scrob-core",
   "types",
-  "scrob-gui",
+  "scrob-web",
+  "scrob-gui-lib",
 ]
 resolver = "2"
 
