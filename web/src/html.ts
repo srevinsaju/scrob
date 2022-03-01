@@ -64,7 +64,7 @@ function playerEditorClickHandler(event: Event) {
 }
 
 function postMessage(message: string) {
-    fetch(`http://localhost:8000/events/status/${message}`).catch(function(e) {
+    fetch(`http://localhost:8000/events/status/ ${message}`).catch(function(e) {
         console.log("Failed sending state", e)
     })
 }
