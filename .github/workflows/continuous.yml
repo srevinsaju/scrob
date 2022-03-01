@@ -20,18 +20,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+    - uses: actions/setup-node@v2
+
+    - name: Generate Web Assets 
+      shell: bash
+      run: |
+        cd web
+        yarn install
+        yarn run setup:dev 
+        yarn run static
+        yarn run build
 
     - name: Dependencies (Linux)
       if: matrix.os == 'ubuntu'
-      run: sudo apt install libdbus-1-dev libpango1.0-dev libatk1.0-dev libsoup2.4-dev libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev
+      run: sudo apt install webkit2gtk-4.0
 
     - name: Dependencies (Windows)
       if: matrix.os == 'windows'
       run: echo "nothing here"
 
-
-    - name: Build
-      run: cargo build
     - name: Build (optimzed)
       env: 
         RUSTFLAGS: "-C link-arg=-s"

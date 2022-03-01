@@ -10,6 +10,7 @@ pub enum Integrations {
     Lastfm,
     Lyrix,
     Notification,
+    Null,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, Serialize, Deserialize)]
@@ -18,6 +19,7 @@ pub enum Event {
     SongPaused,
     SongPlaying,
     NoMediaPlayer,
+    Null,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, Serialize, Deserialize)]
@@ -31,9 +33,24 @@ pub enum Players {
     GenericMusicPlayer,
     Rhythmbox,
     GrooveMusic,
+    Null,
 }
 
 impl Players {
+    pub fn new(name: &str) -> Players {
+        match name {
+            "Youtube" => Players::Youtube,
+            "Elisa" => Players::Elisa,
+            "Spotify" => Players::Spotify,
+            "YoutubeMusic" => Players::YoutubeMusic,
+            "GrooveMusic" => Players::GrooveMusic,
+            "Lollypop" => Players::Lollypop,
+            "GenericMusicPlayer" => Players::GenericMusicPlayer,
+            "Music" => Players::GenericMusicPlayer,
+            _ => Players::GenericMusicPlayer,
+        }
+    }
+
     pub fn as_str(&self) -> &'static str {
         match *self {
             Players::Spotify => "spotify",
@@ -45,6 +62,7 @@ impl Players {
             Players::GenericMusicPlayer => "music",
             Players::Rhythmbox => "rhythmbox",
             Players::GrooveMusic => "groove-music",
+            Players::Null => "",
         }
     }
 
@@ -59,6 +77,7 @@ impl Players {
             Players::GenericMusicPlayer => "Music",
             Players::Rhythmbox => "Rhythmbox",
             Players::GrooveMusic => "Groove Music",
+            Players::Null => "",
         }
     }
 
@@ -73,6 +92,7 @@ impl Players {
             Players::GenericMusicPlayer => DISCORD_APPID_GENERIC,
             Players::Rhythmbox => DISCORD_APPID_GENERIC,
             Players::GrooveMusic => DISCORD_APPID_GROOVE_MUSIC,
+            Players::Null => "",
         }
     }
 }

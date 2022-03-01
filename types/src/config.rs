@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::integrations::{Event, Integrations};
+use crate::integrations::{Event, Integrations, Players};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DiscordSettings {
@@ -53,14 +53,46 @@ impl ::std::default::Default for ScrobConfig {
     }
 }
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub enum OperationType {
+    Event,
+    CustomPlayer,
+    Integration,
+    Null,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ScrobOperation {
+    pub type_: OperationType,
+
     pub enabled: bool,
+
     pub event: Event,
+    pub integration: Integrations,
+    pub custom_player: Players,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ScrobMessage {
-    pub integration: Integrations,
     pub operation: ScrobOperation,
+}
+
+impl ::std::default::Default for ScrobMessage {
+    fn default() -> ScrobMessage {
+        ScrobMessage {
+            operation: ScrobOperation::default(),
+        }
+    }
+}
+
+impl ::std::default::Default for ScrobOperation {
+    fn default() -> ScrobOperation {
+        ScrobOperation {
+            type_: OperationType::Null,
+            enabled: false,
+            event: Event::Null,
+            integration: Integrations::Null,
+            custom_player: Players::Null,
+        }
+    }
 }

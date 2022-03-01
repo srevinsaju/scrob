@@ -1,0 +1,14 @@
+.album-art-square {
+    -webkit-transition: background 500ms ease-in;
+    -moz-transition: background 500ms ease-in;
+    -o-transition: background 500ms ease-in;
+    -ms-transition: background 500ms ease-in;
+    transition: background 500ms ease-in;
+
+    border-radius: 1em;
+}
+
+#lyrics {
+    white-space: pre-line;
+    
+}

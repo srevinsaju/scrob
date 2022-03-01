@@ -6,7 +6,7 @@ use std::time::Duration;
 use std::time::SystemTime;
 use windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager as MediaManager;
 use windows::Media::Control::GlobalSystemMediaTransportControlsSessionPlaybackStatus as MediaStatus;
-use windows::Media::MediaTimelineController;
+
 
 /// Uses the winrt api to get access the media player data.
 pub fn get_current_song() -> Result<Song, &'static str> {
@@ -54,8 +54,10 @@ pub fn get_current_song() -> Result<Song, &'static str> {
     }
 
     let mut source = Players::GenericMusicPlayer;
+    let mut app_id = "".to_string();
     if let Ok(origin) = current_session.SourceAppUserModelId() {
         let origin = origin.to_string();
+        app_id = origin.clone();
         trace!("Detected song from '{}'", origin);
         if origin.starts_with("Microsoft.ZuneMusic") {
             source = Players::GrooveMusic
@@ -73,6 +75,7 @@ pub fn get_current_song() -> Result<Song, &'static str> {
         .expect("Failed to unwrap song metadata even if retrieval was successful.");
 
     let song = Song {
+        app_id: app_id,
         track: song_metadata
             .Title()
             .expect("Failed to retrieve title from song")

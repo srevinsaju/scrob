@@ -11,7 +11,7 @@ use scrob_core::Preferences;
 use types::config::ScrobConfig;
 
 fn config_unix() {
-    let cfg: ScrobConfig = confy::load("scrob")
+    let _: ScrobConfig = confy::load("scrob")
         .expect("Error loading config. Have you logged in yet? Login with 'login' subcommand");
     todo!("Not implemented yet");
 }
